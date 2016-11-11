@@ -53,10 +53,17 @@ if warn > crit:
     sys.exit(UNKNOWN)
      
 
-#Checking Connection
+#Checking ORACLE_SID
 if inst:
     os.environ["ORACLE_SID"] = inst
+elif os.environ.has_key("ORACLE_SID"):
+    inst = os.environ["ORACLE_SID"]
+else:
+    print "ORACLE_SID is not set, use the -i switch to set instance name!"
+    sys.exit(UNKNOWN)
 
+
+#Trying to connect
 try:
     conn = cx_Oracle.Connection(mode = cx_Oracle.SYSDBA)
 except:
@@ -186,7 +193,6 @@ else:
 
 waitperc = round(wtime / time *100, 2)
 
-
 if waitperc < warn:
     rc = OK
 
@@ -195,8 +201,6 @@ if waitperc > warn:
 
 if waitperc > crit:
     rc = CRITICAL
-
-print rcodes[rc]
 
 print "WaitCheck - " + rcodes[rc] + "! " + event + " wait percentage: " + str(waitperc)
 
