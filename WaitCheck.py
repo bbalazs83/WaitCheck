@@ -83,6 +83,15 @@ cursor.close()
 
 print "Connected to Instance " + dbname + " Version: " + vers
 
+#Check for AWR snapshots since instance startup, if there are less than 2 Snapshots after startup: skip check
+qstartup = """select count(*) from dba_hist_snapshot
+        where to_char(STARTUP_TIME, 'DD-MM-YYYY HH24:MI') = (
+	        select to_char(STARTUP_TIME, 'DD-MM-YYYY HH24:MI') from v$instance)"""
+
+snapcount = qry(qstartup)[0]
+if snapcount < 2:
+    print "Less than 2 snapshots, probably instance was restarted recently or AWR snapshots are disabled"
+    sys.exit(UNKNOWN)
 
 #Look for wait event in DBA_HIST_SYSTEM_EVENT
 qwtime="""with old_snap as (
@@ -185,7 +194,7 @@ qdbtim = """with old_snap as (
 dbtime = float(qry(qdbtim)[0])
 print "DB Time between the last 2 snapshots: " + str(round(dbtime,3)) + " sec"
 
-#if dbtime is too low elapsed time will be considered 
+#if dbtime is less than half of elapsed time, then elapsed time will be considered 
 if dbtime * 2 > ela:
     time = dbtime
 else:
