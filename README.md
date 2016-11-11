@@ -1,4 +1,4 @@
-"# WaitCheck" 
+# WaitCheck 
 
 
 A script that checks and reports wait events in an Oracle Database 
