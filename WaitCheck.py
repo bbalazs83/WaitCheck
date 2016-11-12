@@ -42,8 +42,8 @@ if event is None:
     sys.exit(UNKNOWN)
 
 try:
-    warn=int(option_dict['warn'])
-    crit=int(option_dict['crit'])
+    warn=float(option_dict['warn'])
+    crit=float(option_dict['crit'])
 except:
     print "Warning and critical threshold should be numbers!"
     sys.exit(UNKNOWN)
@@ -205,7 +205,7 @@ waitperc = round(wtime / time *100, 2)
 if waitperc < warn:
     rc = OK
 
-if waitperc > warn:
+if waitperc >= warn:
     rc = WARNING
 
 if waitperc > crit:
